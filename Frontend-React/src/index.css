@@ -119,12 +119,78 @@ tbody tr:hover {
   padding: 1rem 0.25rem;
 }
 
+.alert {
+  margin: 0 0 1.25rem;
+  border-radius: 10px;
+  padding: 0.75rem 0.95rem;
+  font-weight: 600;
+}
+
+.alert-success {
+  color: #0f5132;
+  background: #d1e7dd;
+}
+
+.alert-error {
+  color: #9b1c1c;
+  background: #fdecec;
+}
+
 .form-error {
   color: #9b1c1c;
   background: #fdecec;
   border-radius: 8px;
   padding: 0.7rem 0.85rem;
   margin-bottom: 1rem;
+}
+
+.name-link {
+  color: #0b3b66;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.profile-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1.25rem;
+}
+
+.avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.avatar-shape {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: block;
+}
+
+.profile-name {
+  margin: 1rem 0 0.75rem;
+  font-size: 1.6rem;
+}
+
+.profile-field {
+  margin: 0.2rem 0;
+  color: #4b6174;
+}
+
+.profile-field span {
+  font-weight: 700;
+  color: #12202e;
+}
+
+.profile-actions {
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
 }
 
 .staff-form {
@@ -186,6 +252,15 @@ tbody tr:hover {
 
 .btn:hover {
   opacity: 0.92;
+}
+
+.btn-success {
+  color: white;
+  background-color: #198754;
+}
+
+.btn-success:hover {
+  background-color: #157347;
 }
 
 @media (max-width: 640px) {

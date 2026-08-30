@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import Alert from '../components/Alert'
+import { createUser, getUserById, toStaffPayload, updateUser } from '../api/users'
 import { useStaff } from '../context/StaffContext'
 
 const emptyForm = {
@@ -11,34 +13,61 @@ const emptyForm = {
 export default function EditStaff() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { getStaffById, saveStaff } = useStaff()
+  const { refreshStaff } = useStaff()
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(Boolean(id))
+  const [submitting, setSubmitting] = useState(false)
 
-  const existing = id ? getStaffById(id) : null
-  const isEditing = Boolean(existing)
+  const isEditing = Boolean(id)
 
   useEffect(() => {
-    if (id && !existing) {
-      setError('Staff member not found.')
+    if (!id) {
+      setForm(emptyForm)
+      setLoading(false)
       return
     }
 
-    if (existing) {
-      setForm({
-        name: existing.name,
-        age: String(existing.age),
-        title: existing.title ?? '',
-      })
+    let cancelled = false
+
+    async function load() {
+      setLoading(true)
+      setError('')
+      try {
+        const user = await getUserById(id)
+        if (cancelled) return
+        if (!user) {
+          setError('Staff member not found.')
+          return
+        }
+        setForm({
+          name: user.name ?? '',
+          age: user.age === undefined || user.age === null ? '' : String(user.age),
+          title: user.title ?? '',
+        })
+      } catch {
+        if (!cancelled) {
+          setError('Could not load this staff member.')
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
     }
-  }, [id, existing])
+
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [id])
 
   function handleChange(event) {
     const { name, value } = event.target
     setForm((current) => ({ ...current, [name]: value }))
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     setError('')
 
@@ -56,14 +85,32 @@ export default function EditStaff() {
       return
     }
 
-    saveStaff({
-      id: existing?.id,
-      name,
-      age: ageValue,
-      title,
-    })
+    const payload = toStaffPayload({ name, age: ageValue, title })
+    setSubmitting(true)
 
-    navigate('/')
+    try {
+      if (isEditing) {
+        await updateUser(id, payload)
+        await refreshStaff()
+        navigate('/', {
+          state: { alert: { type: 'success', message: 'Staff info successfully upadated!' } },
+        })
+      } else {
+        await createUser(payload)
+        await refreshStaff()
+        navigate('/', {
+          state: { alert: { type: 'success', message: 'New staff successfully registered!' } },
+        })
+      }
+    } catch {
+      setError(
+        isEditing
+          ? 'Update failed, maybe due to a backend error.'
+          : 'Add failed, maybe due to a backend error.',
+      )
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -74,54 +121,57 @@ export default function EditStaff() {
       </header>
 
       <section className="panel">
-        {error ? <p className="form-error">{error}</p> : null}
+        {error ? <Alert type="error">{error}</Alert> : null}
+        {loading ? <p className="empty">Loading…</p> : null}
 
-        <form className="staff-form" onSubmit={handleSubmit}>
-          <label>
-            Name <span aria-hidden="true">*</span>
-            <input
-              name="name"
-              type="text"
-              value={form.name}
-              onChange={handleChange}
-              required
-              autoComplete="name"
-            />
-          </label>
+        {!loading ? (
+          <form className="staff-form" onSubmit={handleSubmit}>
+            <label>
+              Name <span aria-hidden="true">*</span>
+              <input
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                required
+                autoComplete="name"
+              />
+            </label>
 
-          <label>
-            Age <span aria-hidden="true">*</span>
-            <input
-              name="age"
-              type="number"
-              min="0"
-              step="1"
-              value={form.age}
-              onChange={handleChange}
-              required
-            />
-          </label>
+            <label>
+              Age <span aria-hidden="true">*</span>
+              <input
+                name="age"
+                type="number"
+                min="0"
+                step="1"
+                value={form.age}
+                onChange={handleChange}
+                required
+              />
+            </label>
 
-          <label>
-            Title
-            <input
-              name="title"
-              type="text"
-              value={form.title}
-              onChange={handleChange}
-              autoComplete="organization-title"
-            />
-          </label>
+            <label>
+              Title
+              <input
+                name="title"
+                type="text"
+                value={form.title}
+                onChange={handleChange}
+                autoComplete="organization-title"
+              />
+            </label>
 
-          <div className="form-actions">
-            <button className="btn btn-primary" type="submit">
-              Submit
-            </button>
-            <button className="btn btn-secondary" type="button" onClick={() => navigate('/')}>
-              Back
-            </button>
-          </div>
-        </form>
+            <div className="form-actions">
+              <button className="btn btn-primary" type="submit" disabled={submitting}>
+                Submit
+              </button>
+              <button className="btn btn-secondary" type="button" onClick={() => navigate('/')}>
+                Back
+              </button>
+            </div>
+          </form>
+        ) : null}
       </section>
     </div>
   )

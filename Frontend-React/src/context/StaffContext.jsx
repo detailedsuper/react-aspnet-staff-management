@@ -1,58 +1,32 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-
-const STORAGE_KEY = 'staff-management-data'
-
-const seedStaff = [
-  { id: 1, name: 'Ava Chen', age: 32, title: 'Engineering Manager' },
-  { id: 2, name: 'Marcus Hale', age: 28, title: 'Frontend Developer' },
-  { id: 3, name: 'Priya Nair', age: 41, title: 'HR Specialist' },
-]
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { getUsers } from '../api/users'
 
 const StaffContext = createContext(null)
 
-function loadStaff() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return seedStaff
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : seedStaff
-  } catch {
-    return seedStaff
-  }
-}
-
 export function StaffProvider({ children }) {
-  const [staff, setStaff] = useState(loadStaff)
+  const [staff, setStaff] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+
+  const refreshStaff = useCallback(async () => {
+    setLoading(true)
+    try {
+      const users = await getUsers()
+      setStaff(users)
+      setLoadError('')
+    } catch {
+      setLoadError('Could not load staff from the server.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(staff))
-  }, [staff])
-
-  function getStaffById(id) {
-    return staff.find((member) => String(member.id) === String(id))
-  }
-
-  function saveStaff(payload) {
-    if (payload.id) {
-      setStaff((current) =>
-        current.map((member) =>
-          member.id === payload.id ? { ...member, ...payload } : member,
-        ),
-      )
-      return payload.id
-    }
-
-    const nextId = staff.reduce((max, member) => Math.max(max, member.id), 0) + 1
-    setStaff((current) => [...current, { ...payload, id: nextId }])
-    return nextId
-  }
-
-  function deleteStaff(id) {
-    setStaff((current) => current.filter((member) => member.id !== id))
-  }
+    refreshStaff()
+  }, [refreshStaff])
 
   return (
-    <StaffContext.Provider value={{ staff, getStaffById, saveStaff, deleteStaff }}>
+    <StaffContext.Provider value={{ staff, loading, loadError, refreshStaff }}>
       {children}
     </StaffContext.Provider>
   )
