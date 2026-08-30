@@ -31,7 +31,8 @@ public class UserService : IUserService
         var user = new User
         {
             Name = dto.Name,
-            Age = dto.Age
+            Age = dto.Age,
+            Title = dto.Title
         };
 
         _db.Users.Add(user);
@@ -51,6 +52,7 @@ public class UserService : IUserService
 
         user.Name = dto.Name;
         user.Age = dto.Age;
+        user.Title = dto.Title;
 
         await _db.SaveChangesAsync();
 

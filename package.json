@@ -1,0 +1,24 @@
+{
+  "name": "react-aspnet-staff-management",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "npm --prefix Frontend-React install && dotnet restore UserApi/UserApi.csproj",
+
+    "dev": "concurrently --kill-others-on-fail --names frontend,backend --prefix-colors cyan,magenta \"npm --prefix Frontend-React run dev\" \"dotnet watch --project UserApi/UserApi.csproj run\"",
+    "dev:frontend": "npm --prefix Frontend-React run dev",
+    "dev:backend": "dotnet watch --project UserApi/UserApi.csproj run",
+
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "npm --prefix Frontend-React run build",
+    "build:backend": "dotnet build UserApi/UserApi.csproj",
+
+    "lint": "npm --prefix Frontend-React run lint",
+    "format:backend": "dotnet format UserApi/UserApi.csproj",
+
+    "db:update": "dotnet ef database update --project UserApi/UserApi.csproj",
+    "db:migrations": "dotnet ef migrations list --project UserApi/UserApi.csproj",
+
+    "preview": "concurrently --kill-others-on-fail --names frontend,backend \"npm --prefix Frontend-React run preview\" \"dotnet run --project UserApi/UserApi.csproj\""
+  }
+}
