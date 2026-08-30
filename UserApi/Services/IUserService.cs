@@ -5,13 +5,13 @@ namespace UserApi.Services;
 
 public interface IUserService
 {
-    List<User> GetUsers();
+    Task<List<User>> GetUsersAsync();
 
-    User?  GetUserById(int id);
+    Task<User?>  GetUserByIdAsync(int id);
 
-    User Create(CreateUserDto dto);
+    Task<User> CreateAsync(CreateUserDto dto);
 
-    User? Update(int it, UpdateUserDto dto);
+    Task<User?> UpdateAsync(int it, UpdateUserDto dto);
     
-    bool Delete(int id);
+    Task<bool> DeleteAsync(int id);
 }

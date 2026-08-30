@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 using UserApi.DTOs;
@@ -17,17 +18,17 @@ public class UsersController : ControllerBase
    }
 
    [HttpGet]
-   public IActionResult GetUsers() //? same names intendedly?
+   public async Task<IActionResult> GetUsers()
    {
-      var users = _userService.GetUsers();
+      var users = await _userService.GetUsersAsync();
 
       return Ok(users);
    }
 
    [HttpGet("{id}")]
-   public IActionResult GetUserById(int id)
+   public async Task<IActionResult> GetUserById(int id)
    {
-      var user = _userService.GetUserById(id);
+      var user = await _userService.GetUserByIdAsync(id);
 
       if (user == null) 
       {
@@ -38,17 +39,17 @@ public class UsersController : ControllerBase
    }
 
    [HttpPost]
-   public IActionResult Create(CreateUserDto dto)
+   public async Task<IActionResult> Create(CreateUserDto dto)
    {
-      var user = _userService.Create(dto);
+      var user = await _userService.CreateAsync(dto);
 
-      return Created($"/users/{user.Id}", user); //?
+      return Created($"/users/{user.Id}", user);
    }
 
    [HttpPut("{id}")]
-   public IActionResult Update(int id, UpdateUserDto dto)
+   public async Task<IActionResult> Update(int id, UpdateUserDto dto)
    {
-      var user = _userService.Update(id, dto);
+      var user = await _userService.UpdateAsync(id, dto);
 
       if (user == null)
       {
@@ -59,9 +60,9 @@ public class UsersController : ControllerBase
    }
 
    [HttpDelete("{id}")]
-   public IActionResult Delete(int id)
+   public async Task<IActionResult> Delete(int id)
    {
-      var deleted = _userService.Delete(id);
+      var deleted = await _userService.DeleteAsync(id);
 
       if (!deleted) 
       {

@@ -3,42 +3,46 @@ using UserApi.Data;
 using UserApi.Models;
 using UserApi.DTOs;
 
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+
 namespace UserApi.Services;
 
 public class UserService : IUserService
 {
-    private readonly List<User> _users = new()
-    {
-        new User(1, "Alice", 25),
-        new User(2, "Bob", 17),
-        new User(3, "Charlie", 32)
-    };
+    private readonly AppDbContext _db;
 
-    public List<User> GetUsers()
+    public UserService(AppDbContext db)
     {
-        return _users;
+        _db = db;
     }
 
-    public User? GetUserById(int id)
+    public async Task<List<User>> GetUsersAsync()
     {
-        return _users.FirstOrDefault(u => u.Id == id);
+        return await _db.Users.ToListAsync();
     }
 
-    public User Create(CreateUserDto dto)
+    public async Task<User?> GetUserByIdAsync(int id)
     {
-        var user = new User(
-            _users.Count + 1,
-            dto.Name,
-            dto.Age
-        );
+        return await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+    }
 
-        _users.Add(user);
+    public async Task<User> CreateAsync(CreateUserDto dto)
+    {
+        var user = new User
+        {
+            Name = dto.Name,
+            Age = dto.Age
+        };
+
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+
         return user;
     }
 
-    public User? Update(int id, UpdateUserDto dto)
+    public async Task<User?> UpdateAsync(int id, UpdateUserDto dto)
     {
-        var user = _users.FirstOrDefault(u => u.Id == id);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
         {
@@ -48,19 +52,22 @@ public class UserService : IUserService
         user.Name = dto.Name;
         user.Age = dto.Age;
 
+        await _db.SaveChangesAsync();
+
         return user;
     }
 
-    public bool Delete(int id) 
+    public async Task<bool> DeleteAsync(int id) 
     {
-        var user = _users.FirstOrDefault(u => u.Id == id);
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null) 
         {
             return false;
         }
 
-        _users.Remove(user);
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
 
         return true;
     }
