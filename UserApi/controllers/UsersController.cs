@@ -64,12 +64,7 @@ public class UsersController : ControllerBase
    {
       var deleted = await _userService.DeleteAsync(id);
 
-      if (!deleted) 
-      {
-         return NotFound();
-      }
-
-      return NoContent();
+      return Ok(deleted);
    }
 
 }
