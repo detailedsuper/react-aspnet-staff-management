@@ -1,13 +1,15 @@
 {
   "name": "frontend-react",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "React frontend for staff management system with Vite, React Router, and Fetch API",
+  "author": "royal-alchemist",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "oxlint"
   },
   "dependencies": {
     "react": "^19.2.8",
