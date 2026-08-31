@@ -7,14 +7,9 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace UserApi.Services;
 
-public class UserService : IUserService
+public class UserService(AppDbContext db) : IUserService
 {
-    private readonly AppDbContext _db;
-
-    public UserService(AppDbContext db)
-    {
-        _db = db;
-    }
+    private readonly AppDbContext _db = db;
 
     public async Task<List<User>> GetUsersAsync()
     {
