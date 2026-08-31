@@ -1,9 +1,23 @@
 {
   "name": "react-aspnet-staff-management",
   "version": "1.0.0",
+  "description": "A full-stack staff management system built with React and ASP.NET Core",
   "private": true,
+  "keywords": [
+    "react",
+    "aspnet-core",
+    "staff-management",
+    "full-stack",
+    "vite",
+    "dotnet",
+    "postgresql"
+  ],
+  "author": "royal-alchemist",
+  "license": "MIT",
   "scripts": {
     "setup": "npm --prefix Frontend-React install && dotnet restore UserApi/UserApi.csproj",
+    "setup:db": "dotnet ef database update --project UserApi/UserApi.csproj",
+    "setup:all": "npm run setup && npm run setup:db",
 
     "dev": "concurrently --kill-others-on-fail --names frontend,backend --prefix-colors cyan,magenta \"npm --prefix Frontend-React run dev\" \"dotnet watch --project UserApi/UserApi.csproj run\"",
     "dev:frontend": "npm --prefix Frontend-React run dev",
@@ -13,12 +27,20 @@
     "build:frontend": "npm --prefix Frontend-React run build",
     "build:backend": "dotnet build UserApi/UserApi.csproj",
 
+    "preview": "concurrently --kill-others-on-fail --names frontend,backend \"npm --prefix Frontend-React run preview\" \"dotnet run --project UserApi/UserApi.csproj\"",
+    "preview:frontend": "npm --prefix Frontend-React run preview",
+    "preview:backend": "dotnet run --project UserApi/UserApi.csproj",
+
     "lint": "npm --prefix Frontend-React run lint",
+    "format": "npm run lint && npm run format:backend",
     "format:backend": "dotnet format UserApi/UserApi.csproj",
 
     "db:update": "dotnet ef database update --project UserApi/UserApi.csproj",
     "db:migrations": "dotnet ef migrations list --project UserApi/UserApi.csproj",
+    "db:migrate:add": "dotnet ef migrations add",
 
-    "preview": "concurrently --kill-others-on-fail --names frontend,backend \"npm --prefix Frontend-React run preview\" \"dotnet run --project UserApi/UserApi.csproj\""
+    "api:docs": "echo \"API docs available at: https://localhost:7001/swagger\"",
+    "clean": "npm --prefix Frontend-React run clean 2>/dev/null || true && dotnet clean UserApi/UserApi.csproj",
+    "reinstall": "npm run clean && npm run setup:all"
   }
 }
