@@ -44,6 +44,7 @@ export default function Dashboard() {
       <header className="brand">
         <h1>Staff Management Dashboard</h1>
         <p>View, add, and update your team in one place.</p>
+        <p>Current time: {new Date().toLocaleTimeString()}</p>
       </header>
 
       {alert ? <Alert type={alert.type}>{alert.message}</Alert> : null}
